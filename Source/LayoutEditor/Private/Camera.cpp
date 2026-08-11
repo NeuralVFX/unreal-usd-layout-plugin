@@ -231,6 +231,7 @@ void UCamera::Unload()
 		}
 
 		// 3. Destroy safely (The engine is no longer animating it!)
+		// TODO: This part CRASHES
 		if (CachedActor.IsValid())
 		{
 			CachedActor.Get()->Destroy();
