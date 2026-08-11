@@ -61,25 +61,29 @@ void UAsset::Unload()
 {
 	if (IsLoaded())
 	{
-		// Get required arguments
 		FGuid Guid = GetGuid();
-		//AActor* Actor = GetActor();
-
-		// Remove object from sequencer
 		ULevelSequence* Sequence = UHelpers::GetSequence(Sequencer);
-		Sequence->GetMovieScene()->RemovePossessable(Guid);
-		Sequence->UnbindPossessableObjects(Guid);
 
-		// Remove actor from scene
-		if (CachedActor)
+		if (Sequence && Sequence->GetMovieScene())
 		{
-			CachedActor->Destroy();
+			// 1. Unbind BEFORE you Remove (Fixes the Sequencer API crash)
+			Sequence->UnbindPossessableObjects(Guid);
+			Sequence->GetMovieScene()->RemovePossessable(Guid);
+		}
+
+		// 2. Safely check the Weak Pointer. 
+		// If the Actor is still alive, this returns true. If it was already deleted, it safely skips.
+		if (CachedActor.IsValid())
+		{
+			CachedActor.Get()->Destroy();
+			CachedActor.Reset(); // Clear the weak pointer out
 		}
 
 		// Make sure Guid is no longer valid
 		Guid.Invalidate();
 	}
 }
+
 
 
 bool UAsset::IsLoaded()

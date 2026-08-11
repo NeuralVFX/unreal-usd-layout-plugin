@@ -55,6 +55,9 @@ void UAnimatedMeshAsset::Load()
 		{
 			// Spawn actor
 			AStaticMeshActor* SpawnedActor = MakeActor();
+
+			CachedActor = Cast<AActor>(SpawnedActor);
+
 			
 			FGuid Guid;
 			Guid = Sequence->MovieScene->AddPossessable(SpawnedActor->GetActorLabel(), SpawnedActor->GetClass());

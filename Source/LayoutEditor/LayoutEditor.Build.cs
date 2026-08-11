@@ -29,7 +29,8 @@ public class LayoutEditor : ModuleRules
 				"Json",
 				"JsonUtilities",             
 				"USDStage",
-                "UnrealUSDWrapper"
+                "UnrealUSDWrapper",
+                "CinematicCamera",
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -52,7 +53,9 @@ public class LayoutEditor : ModuleRules
                 "MovieScene",
                 "MovieSceneTracks",
                 "DesktopPlatform",
-                "LevelSequenceEditor"
+                "LevelSequenceEditor",
+                "USDClasses", 
+				"USDStageImporter"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

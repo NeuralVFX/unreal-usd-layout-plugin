@@ -28,7 +28,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sequencer")
 	class ALevelSequenceActor * Sequencer;
 
-	class AActor * CachedActor;
+	//class AActor * CachedActor;
+	TWeakObjectPtr<AActor> CachedActor;
 
 	/** World object of scene */
 	class UWorld * World;

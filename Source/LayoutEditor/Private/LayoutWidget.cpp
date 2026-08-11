@@ -4,7 +4,9 @@
 #include "Engine/Selection.h"
 #include "Asset.h"
 #include "MeshAsset.h"
+#include "AnimatedSkelMeshAsset.h"
 #include "StaticMeshAsset.h"
+#include "Camera.h"
 #include "AnimatedMeshAsset.h"
 #include "AssetBox.h"
 #include "Kismet/GameplayStatics.h"
@@ -214,7 +216,7 @@ void ULayoutWidget::LoadUSD()
 
 	if (StaticMeshesGroup)
 	{
-		// 2. Loop through all direct children of this group
+		// 1. Process Static Meshes
 		for (pxr::UsdPrim Prim : StaticMeshesGroup.GetChildren())
 		{
 
@@ -233,8 +235,8 @@ void ULayoutWidget::LoadUSD()
 
 		}
 
+		// 2. Process Animated Static Meshes
 		pxr::UsdPrim AnimatedStaticMeshesGroup = Stage->GetPrimAtPath(pxr::SdfPath("/Root/AnimatedStaticMeshes"));
-
 		for (pxr::UsdPrim Prim : AnimatedStaticMeshesGroup.GetChildren())
 		{
 
@@ -250,6 +252,45 @@ void ULayoutWidget::LoadUSD()
 			// Add asset box to GUI
 			VerticalBox->AddChildToVerticalBox(AssetBoxA);
 			AssetBoxArray.Add(AssetBoxA);
+		}
+
+		// 3. Process Animated Skeletal Meshes
+		pxr::UsdPrim SkeletalMeshesGroup = Stage->GetPrimAtPath(pxr::SdfPath("/Root/SkeletalMeshes"));
+		if (SkeletalMeshesGroup)
+		{
+			for (pxr::UsdPrim Prim : SkeletalMeshesGroup.GetChildren())
+			{
+				// Create asset
+				UAnimatedSkelMeshAsset* NewAsset = NewObject<UAnimatedSkelMeshAsset>();
+				NewAsset->Init(CurrentSequencer, Stage, Prim);
+
+				// Create asset box for GUI
+				UAssetBox* AssetBox = NewObject<UAssetBox>();
+				AssetBox->Init(Cast<UAsset>(NewAsset));
+
+				// Add asset box to GUI
+				VerticalBox->AddChildToVerticalBox(AssetBox);
+				AssetBoxArray.Add(AssetBox);
+			}
+		}
+		// 3. Process Cameras
+		pxr::UsdPrim CamerasGroup = Stage->GetPrimAtPath(pxr::SdfPath("/Root/Cameras"));
+		if (CamerasGroup)
+		{
+			for (pxr::UsdPrim Prim : CamerasGroup.GetChildren())
+			{
+				// Create asset
+				UCamera* NewAsset = NewObject<UCamera>();
+				NewAsset->Init(CurrentSequencer, Stage, Prim);
+
+				// Create asset box for GUI
+				UAssetBox* AssetBox = NewObject<UAssetBox>();
+				AssetBox->Init(Cast<UAsset>(NewAsset));
+
+				// Add asset box to GUI
+				VerticalBox->AddChildToVerticalBox(AssetBox);
+				AssetBoxArray.Add(AssetBox);
+			}
 		}
 	}
 
