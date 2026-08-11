@@ -224,18 +224,16 @@ void UCamera::Unload()
 				MovieScene->RemovePossessable(Guid);
 			}
 
-			// 2. FLUSH THE SEQUENCER CACHE! (The missing Python step)
-			// This forces the live playback engine to let go of the camera.
-			// Use your UHelpers equivalent here, OR use the native UE method:
 			ULevelSequenceEditorBlueprintLibrary::RefreshCurrentLevelSequence();
 		}
 
-		// 3. Destroy safely (The engine is no longer animating it!)
+		Guid.Invalidate();
+
 		// TODO: This part CRASHES
 		if (CachedActor.IsValid())
 		{
 			CachedActor.Get()->Destroy();
-			CachedActor.Reset();
+			CachedActor.Reset(); // Clear the weak pointer out
 		}
 	}
 }

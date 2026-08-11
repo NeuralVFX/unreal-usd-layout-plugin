@@ -42,14 +42,36 @@ FGuid UAsset::GetGuid()
 }
 
 
+//AActor* UAsset::GetActor()
+//{
+//	FGuid Guid = GetGuid();
+//	AActor* Actor = UHelpers::GetActorFromSequencer(Sequencer,Guid);
+//
+//	return Actor;
+//}
+
 AActor* UAsset::GetActor()
 {
 	FGuid Guid = GetGuid();
-	AActor* Actor = UHelpers::GetActorFromSequencer(Sequencer,Guid);
+	ULevelSequence* Sequence = UHelpers::GetSequence(Sequencer);
 
-	return Actor;
+	if (Sequence && Sequencer)
+	{
+		// Use the modern UE 5 Universal Object Locator resolve parameters
+		UE::UniversalObjectLocator::FResolveParams ResolveParams(Sequencer->GetWorld());
+		TArray<UObject*, TInlineAllocator<1>> BoundObjs;
+
+		// Query the Sequencer for what is *actually* bound to this GUID right now
+		Sequence->LocateBoundObjects(Guid, ResolveParams, BoundObjs);
+
+		if (BoundObjs.Num() > 0)
+		{
+			return Cast<AActor>(BoundObjs[0]);
+		}
+	}
+
+	return nullptr;
 }
-
 
 void UAsset::Load()
 {
