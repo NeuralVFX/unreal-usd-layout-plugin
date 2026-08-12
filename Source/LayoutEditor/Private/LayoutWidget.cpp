@@ -11,18 +11,6 @@
 #include "AssetBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelSequence.h"
-#include "Runtime/LevelSequence/Public/LevelSequenceActor.h"
-#include "Components/PanelWidget.h"
-#include "Components/CanvasPanel.h"
-#include "Components/ScrollBox.h"
-#include "Components/VerticalBox.h"
-#include "Components/HorizontalBox.h"
-#include "Components/CanvasPanelSlot.h"
-#include "Components/Button.h"
-#include "Components/TextBlock.h"
-#include "Components/Border.h"
-#include "Components/HorizontalBoxSlot.h"
-#include "Components/SizeBox.h"
 #include "HAL/FileManager.h"
 #include "IDesktopPlatform.h"
 #include "DesktopPlatformModule.h"
@@ -46,111 +34,186 @@ ULayoutWidget::~ULayoutWidget()
 }
 
 
-void ULayoutWidget::NativePreConstruct()
-{
-	Super::NativePreConstruct();
 
+void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* LoadAllButton, UButton* UnLoadAllButton, FString GroupName, int top, int scroll_size)
+{
 	UCanvasPanel* Root = Cast<UCanvasPanel>(GetRootWidget());
 
-	// Setup scroll box to hold layout assets
+	FLinearColor Black = FLinearColor(0, 0, 0);
+	FLinearColor White = FLinearColor(1, 1, 1);
+	USizeBox* Size = NewObject<USizeBox>();
+
+	///////////////////////////////////////
+	// 1. Section Title Label (20% larger text -> Size 10, White)
+	///////////////////////////////////////
+	UTextBlock* GroupTitleText = UHelpers::MakeTextBlock(GroupName, 10, White);
+	UCanvasPanelSlot* TitleSlot = Root->AddChildToCanvas(GroupTitleText);
+	TitleSlot->SetSize(FVector2D(580, 20));
+	TitleSlot->SetPosition(FVector2D(10, top));
+
+	///////////////////////////////////////
+	// 2. Setup Column Labels (Shifted down slightly to clear title)
+	///////////////////////////////////////
+	UHorizontalBox* TopBox = NewObject<UHorizontalBox>();
+
+	Size = NewObject<USizeBox>();
+	Size->SetWidthOverride(70);
+	Size->SetContent(UHelpers::MakeTextBlock("Is Loaded", 8, White));
+	UHorizontalBoxSlot* UISlot_Hor = TopBox->AddChildToHorizontalBox(Size);
+	UISlot_Hor->SetPadding(FMargin(15, 0));
+
+	Size = NewObject<USizeBox>();
+	Size->SetWidthOverride(155);
+	Size->SetContent(UHelpers::MakeTextBlock("Content Name", 8, White));
+	TopBox->AddChildToHorizontalBox(Size);
+
+	Size = NewObject<USizeBox>();
+	Size->SetWidthOverride(155);
+	Size->SetContent(UHelpers::MakeTextBlock("Scene Name", 8, White));
+	TopBox->AddChildToHorizontalBox(Size);
+
+	Size = NewObject<USizeBox>();
+	Size->SetWidthOverride(155);
+	Size->SetContent(UHelpers::MakeTextBlock("Object Type", 8, White));
+	TopBox->AddChildToHorizontalBox(Size);
+
+	UBorder* TopBorder = NewObject<UBorder>();
+	TopBorder->SetContent(TopBox);
+	TopBorder->SetBrushColor(FLinearColor(.05, .05, .05));
+
+	UCanvasPanelSlot* UISlot = Root->AddChildToCanvas(TopBorder);
+	UISlot->SetSize(FVector2D(580, 20));
+	UISlot->SetPosition(FVector2D(10, top + 22));
+
+	///////////////////////////////////////
+	// 3. Setup Scroll Box to hold layout assets
+	///////////////////////////////////////
 	UScrollBox* ScrollBox = NewObject<UScrollBox>();
 	VerticalBox = NewObject<UVerticalBox>();
 	ScrollBox->AddChild(VerticalBox);
 
-	UBorder* Border =NewObject<UBorder>();
+	UBorder* Border = NewObject<UBorder>();
 	Border->SetContent(ScrollBox);
 	Border->SetBrushColor(FLinearColor(.1, .1, .1));
-	
-	// Add scroll box to GUI
-	UCanvasPanelSlot* UISlot = Root->AddChildToCanvas(Border);
-	UISlot->SetSize(FVector2D(580, 400));
-	UISlot->SetPosition(FVector2D(10, 30));
 
-	// Setup horizontal box to hold GUI buttons
-	UHorizontalBox * BotBox = NewObject<UHorizontalBox>();
-	UBorder* BotBorder = NewObject<UBorder>();
-	BotBorder->SetContent(BotBox);
-	BotBorder->SetBrushColor(FLinearColor(.1, .1, .1));
+	UISlot = Root->AddChildToCanvas(Border);
+	UISlot->SetSize(FVector2D(580, scroll_size));
+	UISlot->SetPosition(FVector2D(10, top + 45));
 
-	// Add button area to GUI
-	UISlot = Root->AddChildToCanvas(BotBorder);
+	///////////////////////////////////////
+	// 4. Setup Horizontal Box to hold GUI buttons
+	///////////////////////////////////////
+	UHorizontalBox* ButBox = NewObject<UHorizontalBox>();
+	UBorder* ButBorder = NewObject<UBorder>();
+	ButBorder->SetContent(ButBox);
+	ButBorder->SetBrushColor(FLinearColor(.05, .05, .05, 0.0));
+
+	UISlot = Root->AddChildToCanvas(ButBorder);
 	UISlot->SetSize(FVector2D(580, 30));
-	UISlot->SetPosition(FVector2D(10, 440));
+	UISlot->SetPosition(FVector2D(10, top + scroll_size + 55));
 
-	// Setup buttons
-	UButton*  LoadAllButton = NewObject<UButton>();
-	LoadAllButton->OnClicked.AddDynamic(this, &ULayoutWidget::LoadAll);
-	UHorizontalBoxSlot* UISlot_Hor = BotBox->AddChildToHorizontalBox(LoadAllButton);
+	Size = NewObject<USizeBox>();
+	Size->SetWidthOverride(255);
+	Size->SetContent(LoadAllButton);
+	UISlot_Hor = ButBox->AddChildToHorizontalBox(Size);
 	UISlot_Hor->SetPadding(FMargin(13, 2));
 
-	UButton* UnLoadAllButton = NewObject<UButton>();
-	UnLoadAllButton->OnClicked.AddDynamic(this, &ULayoutWidget::UnLoadAll);
-	UISlot_Hor = BotBox->AddChildToHorizontalBox(UnLoadAllButton);
+	Size = NewObject<USizeBox>();
+	Size->SetWidthOverride(255);
+	Size->SetContent(UnLoadAllButton);
+	UISlot_Hor = ButBox->AddChildToHorizontalBox(Size);
 	UISlot_Hor->SetPadding(FMargin(13, 2));
 
-	UButton* LoadUSDButton = NewObject<UButton>();
-	LoadUSDButton->OnClicked.AddDynamic(this, &ULayoutWidget::LoadUSD);
-	UISlot_Hor = BotBox->AddChildToHorizontalBox(LoadUSDButton);
-	UISlot_Hor->SetPadding(FMargin(13, 2));
+	FButtonStyle ButtonStyle = LoadAllButton->GetStyle();
+	ButtonStyle.Normal.OutlineSettings.Color = ButtonStyle.Hovered.OutlineSettings.Color = ButtonStyle.Pressed.OutlineSettings.Color = FLinearColor::Black;
+	LoadAllButton->SetStyle(ButtonStyle);
+	UnLoadAllButton->SetStyle(ButtonStyle);
+	LoadAllButton->SetContent(UHelpers::MakeTextBlock("Load All Assets", 8, White));
+	LoadAllButton->SetBackgroundColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
+	UnLoadAllButton->SetContent(UHelpers::MakeTextBlock("UnLoad All Assets", 8, White));
+	UnLoadAllButton->SetBackgroundColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
+}
 
-	UButton* SaveUSDButton = NewObject<UButton>();
-	SaveUSDButton->OnClicked.AddDynamic(this, &ULayoutWidget::SaveUSD);
-	UISlot_Hor = BotBox->AddChildToHorizontalBox(SaveUSDButton);
-	UISlot_Hor->SetPadding(FMargin(13, 2));
+
+void ULayoutWidget::NativePreConstruct()
+{
+	Super::NativePreConstruct();
 
 	// Setup text
-	FLinearColor Black = FLinearColor(0, 0,0 );
+	FLinearColor Black = FLinearColor(0, 0, 0);
 	FLinearColor White = FLinearColor(1, 1, 1);
-
-	UTextBlock* LoadAllText = UHelpers::MakeTextBlock("Load All Assets", 8, Black);
-	UTextBlock* UnLoadAllText = UHelpers::MakeTextBlock("UnLoad All Assets", 8, Black);
-	UTextBlock* IsLoadedText = UHelpers::MakeTextBlock("Is Loaded", 8, White);
-	UTextBlock* SceneNameText = UHelpers::MakeTextBlock("Scene Name", 8, White);
-	UTextBlock* ContentNameText = UHelpers::MakeTextBlock("Content Name", 8,White);
-	UTextBlock* ObjectTypeText = UHelpers::MakeTextBlock("Object Type", 8, White);
-	UTextBlock* LoadJsonText = UHelpers::MakeTextBlock("Load Layout File", 8, Black);
-	UTextBlock* SaveJsonText = UHelpers::MakeTextBlock("Save Layout File", 8, Black);
-
-	// Set all button text
-	LoadAllButton->SetContent(LoadAllText);
-	UnLoadAllButton->SetContent(UnLoadAllText);
-	SaveUSDButton->SetContent(SaveJsonText);
-	LoadUSDButton->SetContent(LoadJsonText);
-
-	// Setup column label array
-	UHorizontalBox* TopBox=  NewObject<UHorizontalBox>();
-
 	USizeBox* Size = NewObject<USizeBox>();
-	Size->SetWidthOverride(70);
-	Size->SetContent(IsLoadedText);
-	UISlot_Hor = TopBox->AddChildToHorizontalBox(Size);
-	UISlot_Hor->SetPadding(FMargin(15, 0));
 
-	// Add text to column label area
+	UCanvasPanel* Root = Cast<UCanvasPanel>(GetRootWidget());
+
+
+	// Setup horizontal box to hold GUI buttons
+	UHorizontalBox* ButBox = NewObject<UHorizontalBox>();
+	UBorder* ButBorder = NewObject<UBorder>();
+	ButBorder->SetContent(ButBox);
+	ButBorder->SetBrushColor(FLinearColor(.05, .05, .05, 0.0));
+
+	// Add button area to GUI
+	UCanvasPanelSlot* UISlot = Root->AddChildToCanvas(ButBorder);
+	UISlot->SetSize(FVector2D(580, 30));
+	UISlot->SetPosition(FVector2D(10, 10));
+
+	// Setup initial buttons
+	UButton* LoadUSDButton = NewObject<UButton>();
+	LoadUSDButton->OnClicked.AddDynamic(this, &ULayoutWidget::LoadUSD);
 	Size = NewObject<USizeBox>();
-	Size->SetWidthOverride(155);
-	Size->SetContent(ContentNameText);
-	UISlot_Hor = TopBox->AddChildToHorizontalBox(Size);
+	Size->SetWidthOverride(535);
+	Size->SetContent(LoadUSDButton);
+	UHorizontalBoxSlot* UISlot_Hor = ButBox->AddChildToHorizontalBox(Size);
+	UISlot_Hor->SetPadding(FMargin(13, 2));
 
-	Size = NewObject<USizeBox>();
-	Size->SetWidthOverride(155);
-	Size->SetContent(SceneNameText);
-	UISlot_Hor = TopBox->AddChildToHorizontalBox(Size);
+	//UButton* SaveUSDButton = NewObject<UButton>();
+	//SaveUSDButton->OnClicked.AddDynamic(this, &ULayoutWidget::SaveUSD);
+	//Size = NewObject<USizeBox>();
+	//Size->SetWidthOverride(255);
+	//Size->SetContent(SaveUSDButton);
+	//UISlot_Hor = ButBox->AddChildToHorizontalBox(Size);
+	//UISlot_Hor->SetPadding(FMargin(13, 2));
 
-	Size = NewObject<USizeBox>();
-	Size->SetWidthOverride(155);
-	Size->SetContent(ObjectTypeText);
-	UISlot_Hor = TopBox->AddChildToHorizontalBox(Size);
 
-	UBorder* TopBorder = NewObject<UBorder>();
-	TopBorder->SetContent(TopBox);
-	TopBorder->SetBrushColor(FLinearColor(.1, .1, .1));
+	UTextBlock* LoadJsonText = UHelpers::MakeTextBlock("Load Layout File", 8, Black);
+	//UTextBlock* SaveJsonText = UHelpers::MakeTextBlock("Save Layout File", 8, Black);
+	//SaveUSDButton->SetContent(SaveJsonText);
+	LoadUSDButton->SetContent(LoadJsonText);
+	FButtonStyle ButtonStyle = LoadUSDButton->GetStyle();
+	ButtonStyle.Normal.OutlineSettings.Color = ButtonStyle.Hovered.OutlineSettings.Color = ButtonStyle.Pressed.OutlineSettings.Color = FLinearColor::Black;
+	LoadUSDButton->SetStyle(ButtonStyle);
+	LoadUSDButton->SetContent(UHelpers::MakeTextBlock("Load All Assets", 8, White));
+	LoadUSDButton->SetBackgroundColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
 
-	// Add column label area to GUI
-	UISlot = Root->AddChildToCanvas(TopBorder);
-	UISlot->SetSize(FVector2D(580, 20));
-	UISlot->SetPosition(FVector2D(10, 5));
+	// 1. Camera Assets Group
+	UButton* LoadAllCamBtn = NewObject<UButton>();
+	UButton* UnLoadAllCamBtn = NewObject<UButton>();
+	LoadAllCamBtn->OnClicked.AddDynamic(this, &ULayoutWidget::LoadAllCam);
+	UnLoadAllCamBtn->OnClicked.AddDynamic(this, &ULayoutWidget::UnLoadAllCam);
+	GenerateAssetGroup(CamVerticalBox, LoadAllCamBtn, UnLoadAllCamBtn, "Cameras", 50, 30);
+
+	// 2. Skeletal Mesh Assets Group
+	UButton* LoadAllSkelBtn = NewObject<UButton>();
+	UButton* UnLoadAllSkelBtn = NewObject<UButton>();
+	LoadAllSkelBtn->OnClicked.AddDynamic(this, &ULayoutWidget::LoadAllSkel);
+	UnLoadAllSkelBtn->OnClicked.AddDynamic(this, &ULayoutWidget::UnLoadAllSkel);
+	GenerateAssetGroup(SkelVerticalBox, LoadAllSkelBtn, UnLoadAllSkelBtn, "Skeletal Meshes", 170, 120);
+
+	// 3. Static Mesh Assets Group
+	UButton* LoadAllStaticBtn = NewObject<UButton>();
+	UButton* UnLoadAllStaticBtn = NewObject<UButton>();
+	LoadAllStaticBtn->OnClicked.AddDynamic(this, &ULayoutWidget::LoadAllStatic);
+	UnLoadAllStaticBtn->OnClicked.AddDynamic(this, &ULayoutWidget::UnLoadAllStatic);
+	GenerateAssetGroup(StaticVerticalBox, LoadAllStaticBtn, UnLoadAllStaticBtn, "Static Meshes", 380, 120);
+
+
+
+
 }
+
+
+
 
 
 void ULayoutWidget::SaveUSD()
@@ -190,8 +253,20 @@ void ULayoutWidget::SaveUSD()
 void ULayoutWidget::LoadUSD()
 {
 	// Clear assets from GUI
-	VerticalBox->ClearChildren();
-	AssetBoxArray.Empty();
+	CamVerticalBox->ClearChildren();
+	CamAssetBoxArray.Empty();
+
+	// Clear assets from GUI
+	SkelVerticalBox->ClearChildren();
+	SkelAssetBoxArray.Empty();
+
+	// Clear assets from GUI
+	StaticVerticalBox->ClearChildren();
+	StaticAssetBoxArray.Empty();
+
+	// Clear assets from GUI
+	//StaticAnimVerticalBox->ClearChildren();
+	//StaticAnimAssetBoxArray.Empty();
 
 	// Get Sequencer
 	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
@@ -230,8 +305,8 @@ void ULayoutWidget::LoadUSD()
 			AssetBoxA->Init(Cast<UAsset>(NewAsset));
 
 			// Add asset box to GUI
-			VerticalBox->AddChildToVerticalBox(AssetBoxA);
-			AssetBoxArray.Add(AssetBoxA);
+			StaticVerticalBox->AddChildToVerticalBox(AssetBoxA);
+			StaticAssetBoxArray.Add(AssetBoxA);
 
 		}
 
@@ -250,8 +325,8 @@ void ULayoutWidget::LoadUSD()
 			AssetBoxA->Init(Cast<UAsset>(NewAsset));
 
 			// Add asset box to GUI
-			VerticalBox->AddChildToVerticalBox(AssetBoxA);
-			AssetBoxArray.Add(AssetBoxA);
+			StaticVerticalBox->AddChildToVerticalBox(AssetBoxA);
+			StaticAssetBoxArray.Add(AssetBoxA);
 		}
 
 		// 3. Process Animated Skeletal Meshes
@@ -269,11 +344,11 @@ void ULayoutWidget::LoadUSD()
 				AssetBox->Init(Cast<UAsset>(NewAsset));
 
 				// Add asset box to GUI
-				VerticalBox->AddChildToVerticalBox(AssetBox);
-				AssetBoxArray.Add(AssetBox);
+				SkelVerticalBox->AddChildToVerticalBox(AssetBox);
+				SkelAssetBoxArray.Add(AssetBox);
 			}
 		}
-		// 3. Process Cameras
+		// 3. Process Animated Skeletal Meshes
 		pxr::UsdPrim CamerasGroup = Stage->GetPrimAtPath(pxr::SdfPath("/Root/Cameras"));
 		if (CamerasGroup)
 		{
@@ -288,8 +363,8 @@ void ULayoutWidget::LoadUSD()
 				AssetBox->Init(Cast<UAsset>(NewAsset));
 
 				// Add asset box to GUI
-				VerticalBox->AddChildToVerticalBox(AssetBox);
-				AssetBoxArray.Add(AssetBox);
+				CamVerticalBox->AddChildToVerticalBox(AssetBox);
+				CamAssetBoxArray.Add(AssetBox);
 			}
 		}
 	}
@@ -299,10 +374,52 @@ void ULayoutWidget::LoadUSD()
 
 
 
-void ULayoutWidget::LoadAll()
+void ULayoutWidget::LoadAllCam()
 {
 	// Attempt to load each asset, update GUI
-	for (UAssetBox* AssetBoxA : AssetBoxArray)
+	for (UAssetBox* AssetBoxA : CamAssetBoxArray)
+	{
+		AssetBoxA->Asset->Load();
+		AssetBoxA->EvaluateState();
+	}
+
+	// Update sequencer GUI
+	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
+	UHelpers::UpdateSequencer(CurrentSequencer);
+}
+
+void ULayoutWidget::LoadAllSkel()
+{
+	// Attempt to load each asset, update GUI
+	for (UAssetBox* AssetBoxA : SkelAssetBoxArray)
+	{
+		AssetBoxA->Asset->Load();
+		AssetBoxA->EvaluateState();
+	}
+
+	// Update sequencer GUI
+	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
+	UHelpers::UpdateSequencer(CurrentSequencer);
+}
+
+void ULayoutWidget::LoadAllStatic()
+{
+	// Attempt to load each asset, update GUI
+	for (UAssetBox* AssetBoxA : StaticAssetBoxArray)
+	{
+		AssetBoxA->Asset->Load();
+		AssetBoxA->EvaluateState();
+	}
+
+	// Update sequencer GUI
+	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
+	UHelpers::UpdateSequencer(CurrentSequencer);
+}
+
+void ULayoutWidget::LoadAllStaticAnim()
+{
+	// Attempt to load each asset, update GUI
+	for (UAssetBox* AssetBoxA : StaticAnimAssetBoxArray)
 	{
 		AssetBoxA->Asset->Load();
 		AssetBoxA->EvaluateState();
@@ -314,10 +431,10 @@ void ULayoutWidget::LoadAll()
 }
 
 
-void ULayoutWidget::UnLoadAll()
+void ULayoutWidget::UnLoadAllCam()
 {
 	// Attempt to unload each asset
-	for (UAssetBox* AssetBoxA : AssetBoxArray)
+	for (UAssetBox* AssetBoxA : CamAssetBoxArray)
 	{
 		AssetBoxA->Asset->Unload();
 		AssetBoxA->EvaluateState();
@@ -328,6 +445,47 @@ void ULayoutWidget::UnLoadAll()
 	UHelpers::UpdateSequencer(CurrentSequencer);
 }
 
+void ULayoutWidget::UnLoadAllSkel()
+{
+	// Attempt to unload each asset
+	for (UAssetBox* AssetBoxA : SkelAssetBoxArray)
+	{
+		AssetBoxA->Asset->Unload();
+		AssetBoxA->EvaluateState();
+	}
+
+	// Update sequencer GUI
+	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
+	UHelpers::UpdateSequencer(CurrentSequencer);
+}
+
+void ULayoutWidget::UnLoadAllStatic()
+{
+	// Attempt to unload each asset
+	for (UAssetBox* AssetBoxA : StaticAssetBoxArray)
+	{
+		AssetBoxA->Asset->Unload();
+		AssetBoxA->EvaluateState();
+	}
+
+	// Update sequencer GUI
+	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
+	UHelpers::UpdateSequencer(CurrentSequencer);
+}
+
+void ULayoutWidget::UnLoadAllStaticAnim()
+{
+	// Attempt to unload each asset
+	for (UAssetBox* AssetBoxA : StaticAnimAssetBoxArray)
+	{
+		AssetBoxA->Asset->Unload();
+		AssetBoxA->EvaluateState();
+	}
+
+	// Update sequencer GUI
+	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
+	UHelpers::UpdateSequencer(CurrentSequencer);
+}
 
 FString ULayoutWidget::LoadUSDFile()
 {

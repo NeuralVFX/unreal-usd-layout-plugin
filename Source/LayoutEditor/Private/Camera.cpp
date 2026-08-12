@@ -203,6 +203,8 @@ void UCamera::Unload()
 {
 	if (IsLoaded())
 	{
+
+
 		FGuid Guid = GetGuid();
 		FGuid CompGuid = GetCompGuid();
 
