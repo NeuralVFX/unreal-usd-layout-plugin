@@ -49,7 +49,33 @@ def unreal_transform(pa, frame=None, is_camera=False):
     ans = ans * unreal_space
     return list(ans)
 
+def unreal_transform(pa, frame=None, is_camera=False):
+    if frame is not None:
+        loc_matrix_list = cmds.getAttr(f"{pa}.worldMatrix[0]", time=frame)
+    else:
+        loc_matrix_list = cmds.xform(pa, q=True, m=True, ws=True)
 
+    loc_matrix = om.MMatrix(loc_matrix_list)
+
+    if is_camera:
+        yaw_mtx = om.MEulerRotation(0.0, math.radians(90.0), 0.0).asMatrix()
+        pitch_mtx = om.MEulerRotation(math.radians(-90.0), 0.0, 0.0).asMatrix()
+        cam_offset = pitch_mtx * yaw_mtx
+        loc_matrix = yaw_mtx * loc_matrix
+
+
+    unreal_space = om.MMatrix([
+        1.0, 0.0, 0.0, 0.0, 
+        0.0, 0.0, 1.0, 0.0, 
+        0.0, 1.0, 0.0, 0.0, 
+        0.0, 0.0, 0.0, 1.0
+    ])
+
+    ans = unreal_space * ( loc_matrix)
+    ans = ans * unreal_space
+    return list(ans)
+
+    
 def is_animated(pa, start_frame, end_frame):
     tx, ty, tz = set(), set(), set()
     rx, ry, rz = set(), set(), set()
