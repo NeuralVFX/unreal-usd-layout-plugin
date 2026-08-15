@@ -309,7 +309,6 @@ def apply_standard_ui_setup(dialog):
     
 maya_organizer_ui_instance = None
 
-
 # ==========================================
 # GUI CLASS DEFINITIONS
 # ==========================================
@@ -319,125 +318,125 @@ class Ui_Dialog(object):
         Dialog.resize(480, 580)
         self.gridLayout = QtWidgets.QGridLayout(Dialog)
         self.gridLayout.setObjectName("gridLayout")
-        
+
         # Force columns 0 and 2 to expand equally, while keeping column 1 (the arrows) tight
         self.gridLayout.setColumnStretch(0, 1)
         self.gridLayout.setColumnStretch(1, 0)
         self.gridLayout.setColumnStretch(2, 1)
-        
+
         # --- TOP ROW: Publish Button ---
         self.pushButton_publish = QtWidgets.QPushButton(Dialog)
         self.pushButton_publish.setObjectName("pushButton_publish")
         # Make the publish button span all 3 columns
         self.gridLayout.addWidget(self.pushButton_publish, 0, 0, 1, 3)
-        
+
         # ==========================================
-        # CAMERAS SECTION
+        # CAMERAS SECTION (Rows 1 & 2)
         # ==========================================
         self.label_7 = QtWidgets.QLabel(Dialog)
         self.label_7.setObjectName("label_7")
         self.gridLayout.addWidget(self.label_7, 1, 0, 1, 1)
-        
+
         self.label_8 = QtWidgets.QLabel(Dialog)
         self.label_8.setObjectName("label_8")
         self.gridLayout.addWidget(self.label_8, 1, 2, 1, 1)
-        
+
         self.listWidget_cams = QtWidgets.QListWidget(Dialog)
         self.listWidget_cams.setObjectName("listWidget_cams")
         self.gridLayout.addWidget(self.listWidget_cams, 2, 0, 1, 1)
-        
+
         self.listWidget_taggedCams = QtWidgets.QListWidget(Dialog)
         self.listWidget_taggedCams.setObjectName("listWidget_taggedCams")
         self.gridLayout.addWidget(self.listWidget_taggedCams, 2, 2, 1, 1)
-        
+
         # Middle Arrows for Cams
         self.verticalLayout_cams = QtWidgets.QVBoxLayout()
         self.verticalLayout_cams.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        
+
         self.pushButton_addCam = QtWidgets.QPushButton(Dialog)
         self.pushButton_addCam.setObjectName("pushButton_addCam")
         self.pushButton_addCam.setFixedSize(30, 30)
         self.verticalLayout_cams.addWidget(self.pushButton_addCam)
-        
+
         self.pushButton_removeCam = QtWidgets.QPushButton(Dialog)
         self.pushButton_removeCam.setObjectName("pushButton_removeCam")
         self.pushButton_removeCam.setFixedSize(30, 30)
         self.verticalLayout_cams.addWidget(self.pushButton_removeCam)
-        
+
         self.verticalLayout_cams.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
         self.gridLayout.addLayout(self.verticalLayout_cams, 2, 1, 1, 1)
-        
+
         # ==========================================
-        # MDL REFERENCES SECTION
-        # ==========================================
-        self.label_2 = QtWidgets.QLabel(Dialog)
-        self.label_2.setObjectName("label_2")
-        self.gridLayout.addWidget(self.label_2, 3, 0, 1, 1)
-        
-        self.label_3 = QtWidgets.QLabel(Dialog)
-        self.label_3.setObjectName("label_3")
-        self.gridLayout.addWidget(self.label_3, 3, 2, 1, 1)
-        
-        self.listWidget_mdlRefs = QtWidgets.QListWidget(Dialog)
-        self.listWidget_mdlRefs.setObjectName("listWidget_mdlRefs")
-        self.gridLayout.addWidget(self.listWidget_mdlRefs, 4, 0, 1, 1)
-        
-        self.listWidget_taggedMdlRefs = QtWidgets.QListWidget(Dialog)
-        self.listWidget_taggedMdlRefs.setObjectName("listWidget_taggedMdlRefs")
-        self.gridLayout.addWidget(self.listWidget_taggedMdlRefs, 4, 2, 1, 1)
-        
-        # Middle Arrows for MDLs
-        self.verticalLayout_mdl = QtWidgets.QVBoxLayout()
-        self.verticalLayout_mdl.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        
-        self.pushButton_addMdlRef = QtWidgets.QPushButton(Dialog)
-        self.pushButton_addMdlRef.setObjectName("pushButton_addMdlRef")
-        self.pushButton_addMdlRef.setFixedSize(30, 30)
-        self.verticalLayout_mdl.addWidget(self.pushButton_addMdlRef)
-        
-        self.pushButton_removeMdlRef = QtWidgets.QPushButton(Dialog)
-        self.pushButton_removeMdlRef.setObjectName("pushButton_removeMdlRef")
-        self.pushButton_removeMdlRef.setFixedSize(30, 30)
-        self.verticalLayout_mdl.addWidget(self.pushButton_removeMdlRef)
-        
-        self.verticalLayout_mdl.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        self.gridLayout.addLayout(self.verticalLayout_mdl, 4, 1, 1, 1)
-        
-        # ==========================================
-        # RIG REFERENCES SECTION
+        # RIG (SKELETAL MESHES) SECTION (Rows 3 & 4)
         # ==========================================
         self.label_5 = QtWidgets.QLabel(Dialog)
         self.label_5.setObjectName("label_5")
-        self.gridLayout.addWidget(self.label_5, 5, 0, 1, 1)
-        
+        self.gridLayout.addWidget(self.label_5, 3, 0, 1, 1)
+
         self.label_6 = QtWidgets.QLabel(Dialog)
         self.label_6.setObjectName("label_6")
-        self.gridLayout.addWidget(self.label_6, 5, 2, 1, 1)
-        
+        self.gridLayout.addWidget(self.label_6, 3, 2, 1, 1)
+
         self.listWidget_rigRefs = QtWidgets.QListWidget(Dialog)
         self.listWidget_rigRefs.setObjectName("listWidget_rigRefs")
-        self.gridLayout.addWidget(self.listWidget_rigRefs, 6, 0, 1, 1)
-        
+        self.gridLayout.addWidget(self.listWidget_rigRefs, 4, 0, 1, 1)
+
         self.listWidget_taggedRigRefs = QtWidgets.QListWidget(Dialog)
         self.listWidget_taggedRigRefs.setObjectName("listWidget_taggedRigRefs")
-        self.gridLayout.addWidget(self.listWidget_taggedRigRefs, 6, 2, 1, 1)
-        
+        self.gridLayout.addWidget(self.listWidget_taggedRigRefs, 4, 2, 1, 1)
+
         # Middle Arrows for RIGs
         self.verticalLayout_rig = QtWidgets.QVBoxLayout()
         self.verticalLayout_rig.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        
+
         self.pushButton_addRigRef = QtWidgets.QPushButton(Dialog)
         self.pushButton_addRigRef.setObjectName("pushButton_addRigRef")
         self.pushButton_addRigRef.setFixedSize(30, 30)
         self.verticalLayout_rig.addWidget(self.pushButton_addRigRef)
-        
+
         self.pushButton_removeRigRef = QtWidgets.QPushButton(Dialog)
         self.pushButton_removeRigRef.setObjectName("pushButton_removeRigRef")
         self.pushButton_removeRigRef.setFixedSize(30, 30)
         self.verticalLayout_rig.addWidget(self.pushButton_removeRigRef)
-        
+
         self.verticalLayout_rig.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        self.gridLayout.addLayout(self.verticalLayout_rig, 6, 1, 1, 1)
+        self.gridLayout.addLayout(self.verticalLayout_rig, 4, 1, 1, 1)
+
+        # ==========================================
+        # MDL (STATIC MESHES) SECTION (Rows 5 & 6)
+        # ==========================================
+        self.label_2 = QtWidgets.QLabel(Dialog)
+        self.label_2.setObjectName("label_2")
+        self.gridLayout.addWidget(self.label_2, 5, 0, 1, 1)
+
+        self.label_3 = QtWidgets.QLabel(Dialog)
+        self.label_3.setObjectName("label_3")
+        self.gridLayout.addWidget(self.label_3, 5, 2, 1, 1)
+
+        self.listWidget_mdlRefs = QtWidgets.QListWidget(Dialog)
+        self.listWidget_mdlRefs.setObjectName("listWidget_mdlRefs")
+        self.gridLayout.addWidget(self.listWidget_mdlRefs, 6, 0, 1, 1)
+
+        self.listWidget_taggedMdlRefs = QtWidgets.QListWidget(Dialog)
+        self.listWidget_taggedMdlRefs.setObjectName("listWidget_taggedMdlRefs")
+        self.gridLayout.addWidget(self.listWidget_taggedMdlRefs, 6, 2, 1, 1)
+
+        # Middle Arrows for MDLs
+        self.verticalLayout_mdl = QtWidgets.QVBoxLayout()
+        self.verticalLayout_mdl.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+
+        self.pushButton_addMdlRef = QtWidgets.QPushButton(Dialog)
+        self.pushButton_addMdlRef.setObjectName("pushButton_addMdlRef")
+        self.pushButton_addMdlRef.setFixedSize(30, 30)
+        self.verticalLayout_mdl.addWidget(self.pushButton_addMdlRef)
+
+        self.pushButton_removeMdlRef = QtWidgets.QPushButton(Dialog)
+        self.pushButton_removeMdlRef.setObjectName("pushButton_removeMdlRef")
+        self.pushButton_removeMdlRef.setFixedSize(30, 30)
+        self.verticalLayout_mdl.addWidget(self.pushButton_removeMdlRef)
+
+        self.verticalLayout_mdl.addItem(QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
+        self.gridLayout.addLayout(self.verticalLayout_mdl, 6, 1, 1, 1)
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -445,29 +444,29 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "USD Publish Organizer"))
-        
+
         self.pushButton_publish.setText(_translate("Dialog", "Publish USD"))
-        
+
         self.label_7.setText(_translate("Dialog", "Exportable Cameras:"))
         self.label_8.setText(_translate("Dialog", "Tagged For Export:"))
-        
-        self.label_2.setText(_translate("Dialog", "Exportable Static Meshes:"))
-        self.label_3.setText(_translate("Dialog", "Tagged For Export:"))
-        
+
         self.label_5.setText(_translate("Dialog", "Exportable Skeletal Meshes:"))
         self.label_6.setText(_translate("Dialog", "Tagged For Export:"))
+
+        self.label_2.setText(_translate("Dialog", "Exportable Static Meshes:"))
+        self.label_3.setText(_translate("Dialog", "Tagged For Export:"))
 
         # Set the text of the buttons to arrows instead of full phrases
         # ▶ (Right pointing triangle) pushes items to the "Tagged" list
         # ◀ (Left pointing triangle) removes them back to the "Exportable" list
         self.pushButton_addCam.setText(_translate("Dialog", "▶"))
         self.pushButton_removeCam.setText(_translate("Dialog", "◀"))
-        
-        self.pushButton_addMdlRef.setText(_translate("Dialog", "▶"))
-        self.pushButton_removeMdlRef.setText(_translate("Dialog", "◀"))
-        
+
         self.pushButton_addRigRef.setText(_translate("Dialog", "▶"))
         self.pushButton_removeRigRef.setText(_translate("Dialog", "◀"))
+
+        self.pushButton_addMdlRef.setText(_translate("Dialog", "▶"))
+        self.pushButton_removeMdlRef.setText(_translate("Dialog", "◀"))
 
 
 # ==========================================
