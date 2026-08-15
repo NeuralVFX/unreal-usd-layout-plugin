@@ -79,7 +79,14 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 
 	UBorder* TopBorder = NewObject<UBorder>();
 	TopBorder->SetContent(TopBox);
-	TopBorder->SetBrushColor(FLinearColor(.05, .05, .05));
+
+	FSlateBrush HeaderRoundedBrush;
+	HeaderRoundedBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
+	HeaderRoundedBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+	HeaderRoundedBrush.OutlineSettings.CornerRadii = FVector4(5.0f, 5.0f, 5.0f, 5.0f);
+
+	HeaderRoundedBrush.TintColor = FSlateColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
+	TopBorder->SetBrush(HeaderRoundedBrush);
 
 	UCanvasPanelSlot* UISlot = Root->AddChildToCanvas(TopBorder);
 	UISlot->SetSize(FVector2D(580, 20));
@@ -89,12 +96,33 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 	// 3. Setup Scroll Box to hold layout assets
 	///////////////////////////////////////
 	UScrollBox* ScrollBox = NewObject<UScrollBox>();
+
+	// --- Remove the default scroll shadows ---
+	ScrollBox->WidgetStyle.TopShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+	ScrollBox->WidgetStyle.BottomShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+	ScrollBox->WidgetStyle.LeftShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+	ScrollBox->WidgetStyle.RightShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
+	// -----------------------------------------
+
 	VerticalBox = NewObject<UVerticalBox>();
 	ScrollBox->AddChild(VerticalBox);
 
 	UBorder* Border = NewObject<UBorder>();
 	Border->SetContent(ScrollBox);
-	Border->SetBrushColor(FLinearColor(.1, .1, .1));
+
+	// --- Remove default border padding so content reaches the edges ---
+	Border->SetPadding(FMargin(0.0f));
+
+	// --- Clip the scrolling content so it doesn't poke outside the rounded corners ---
+	Border->SetClipping(EWidgetClipping::ClipToBounds);
+
+	// --- Create a Rounded Brush for the Spreadsheet Area ---
+	FSlateBrush RoundedBrush;
+	RoundedBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
+	RoundedBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
+	RoundedBrush.OutlineSettings.CornerRadii = FVector4(5.0f, 5.0f, 5.0f, 5.0f);
+	RoundedBrush.TintColor = FSlateColor(FLinearColor(0.1f, 0.1f, 0.1f, 1.0f));
+	Border->SetBrush(RoundedBrush);
 
 	UISlot = Root->AddChildToCanvas(Border);
 	UISlot->SetSize(FVector2D(580, scroll_size));
@@ -130,7 +158,7 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 	UnLoadAllButton->SetStyle(ButtonStyle);
 	LoadAllButton->SetContent(UHelpers::MakeTextBlock("Load All Assets", 8, White));
 	LoadAllButton->SetBackgroundColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
-	UnLoadAllButton->SetContent(UHelpers::MakeTextBlock("UnLoad All Assets", 8, White));
+	UnLoadAllButton->SetContent(UHelpers::MakeTextBlock("Un-Load All Assets", 8, White));
 	UnLoadAllButton->SetBackgroundColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
 }
 
@@ -167,23 +195,10 @@ void ULayoutWidget::NativePreConstruct()
 	UHorizontalBoxSlot* UISlot_Hor = ButBox->AddChildToHorizontalBox(Size);
 	UISlot_Hor->SetPadding(FMargin(13, 2));
 
-	//UButton* SaveUSDButton = NewObject<UButton>();
-	//SaveUSDButton->OnClicked.AddDynamic(this, &ULayoutWidget::SaveUSD);
-	//Size = NewObject<USizeBox>();
-	//Size->SetWidthOverride(255);
-	//Size->SetContent(SaveUSDButton);
-	//UISlot_Hor = ButBox->AddChildToHorizontalBox(Size);
-	//UISlot_Hor->SetPadding(FMargin(13, 2));
-
-
-	UTextBlock* LoadJsonText = UHelpers::MakeTextBlock("Load Layout File", 8, Black);
-	//UTextBlock* SaveJsonText = UHelpers::MakeTextBlock("Save Layout File", 8, Black);
-	//SaveUSDButton->SetContent(SaveJsonText);
-	LoadUSDButton->SetContent(LoadJsonText);
 	FButtonStyle ButtonStyle = LoadUSDButton->GetStyle();
 	ButtonStyle.Normal.OutlineSettings.Color = ButtonStyle.Hovered.OutlineSettings.Color = ButtonStyle.Pressed.OutlineSettings.Color = FLinearColor::Black;
 	LoadUSDButton->SetStyle(ButtonStyle);
-	LoadUSDButton->SetContent(UHelpers::MakeTextBlock("Load All Assets", 8, White));
+	LoadUSDButton->SetContent(UHelpers::MakeTextBlock("Load USD", 8, White));
 	LoadUSDButton->SetBackgroundColor(FLinearColor(0.05f, 0.05f, 0.05f, 1.0f));
 
 	// 1. Camera Assets Group

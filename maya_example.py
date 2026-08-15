@@ -265,13 +265,15 @@ def apply_standard_ui_setup(dialog):
             font-weight: bold; 
         }
         
-        /* General List Widget Styling */
+        /* --- UPDATED LIST WIDGET STYLING --- */
         QListWidget {
             background-color: #555555; 
-            border: 1px solid #000000; 
-            border-radius: 2px;
+            border: none;          /* Removed the black outline */
+            border-radius: 5px;    /* Increased to 5px to match Unreal */
             font-weight: 600; 
+            padding: 2px;          /* Gives a tiny bit of inner spacing */
         }
+        /* ----------------------------------- */
         
         /* Left Side Lists: Black Text */
         QListWidget#listWidget_cams,
