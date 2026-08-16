@@ -169,10 +169,21 @@ void UCamera::Load()
 
 			if (!FocalTimeSamples.empty())
 			{
-				UMovieSceneFloatTrack* FocalTrack = Cast<UMovieSceneFloatTrack>(Sequence->MovieScene->AddTrack(UMovieSceneFloatTrack::StaticClass(), Guid));
+				UCineCameraComponent* CamComp = SpawnedActor->GetCineCameraComponent();
 
-				// Bind directly to the CameraComponent's property via path
-				FocalTrack->SetPropertyNameAndPath(TEXT("CurrentFocalLength"), TEXT("CameraComponent.CurrentFocalLength"));
+				FGuid CompGuid = Sequence->MovieScene->AddPossessable(CamComp->GetName(), CamComp->GetClass());
+
+				FMovieScenePossessable* CompPossessable = Sequence->MovieScene->FindPossessable(CompGuid);
+				if (CompPossessable)
+				{
+					CompPossessable->SetParent(Guid, Sequence->MovieScene);
+				}
+
+				Sequence->BindPossessableObject(CompGuid, *CamComp, SpawnedActor);
+
+				UMovieSceneFloatTrack* FocalTrack = Cast<UMovieSceneFloatTrack>(Sequence->MovieScene->AddTrack(UMovieSceneFloatTrack::StaticClass(), CompGuid));
+
+				FocalTrack->SetPropertyNameAndPath(TEXT("CurrentFocalLength"), TEXT("CurrentFocalLength"));
 
 				UMovieSceneSection* FocalSection = FocalTrack->CreateNewSection();
 				FocalSection->SetStartFrame(UHelpers::GetFrameNumberTick(Sequencer, FocalTimeSamples.front(), false));
@@ -186,14 +197,13 @@ void UCamera::Load()
 				for (double TimeKey : FocalTimeSamples)
 				{
 					FFrameNumber Frame = UHelpers::GetFrameNumberTick(Sequencer, TimeKey, false);
-
-					// USD Camera Focal Length is typically natively stored as a float
 					float FocalVal = 35.0f;
 					FocalLengthAttr.Get(&FocalVal, TimeKey);
-
 					FocalChannel->AddCubicKey(Frame, FocalVal, ERichCurveTangentMode::RCTM_Auto);
 				}
 			}
+
+		
 		}
 	}
 }
@@ -231,7 +241,6 @@ void UCamera::Unload()
 
 		Guid.Invalidate();
 
-		// TODO: This part CRASHES
 		if (CachedActor.IsValid())
 		{
 			CachedActor.Get()->Destroy();

@@ -43,17 +43,12 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 	FLinearColor White = FLinearColor(1, 1, 1);
 	USizeBox* Size = NewObject<USizeBox>();
 
-	///////////////////////////////////////
-	// 1. Section Title Label (20% larger text -> Size 10, White)
-	///////////////////////////////////////
 	UTextBlock* GroupTitleText = UHelpers::MakeTextBlock(GroupName, 10, White);
 	UCanvasPanelSlot* TitleSlot = Root->AddChildToCanvas(GroupTitleText);
 	TitleSlot->SetSize(FVector2D(580, 20));
 	TitleSlot->SetPosition(FVector2D(10, top));
 
-	///////////////////////////////////////
-	// 2. Setup Column Labels (Shifted down slightly to clear title)
-	///////////////////////////////////////
+
 	UHorizontalBox* TopBox = NewObject<UHorizontalBox>();
 
 	Size = NewObject<USizeBox>();
@@ -92,17 +87,13 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 	UISlot->SetSize(FVector2D(580, 20));
 	UISlot->SetPosition(FVector2D(10, top + 22));
 
-	///////////////////////////////////////
-	// 3. Setup Scroll Box to hold layout assets
-	///////////////////////////////////////
+
 	UScrollBox* ScrollBox = NewObject<UScrollBox>();
 
-	// --- Remove the default scroll shadows ---
 	ScrollBox->WidgetStyle.TopShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
 	ScrollBox->WidgetStyle.BottomShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
 	ScrollBox->WidgetStyle.LeftShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
 	ScrollBox->WidgetStyle.RightShadowBrush.DrawAs = ESlateBrushDrawType::NoDrawType;
-	// -----------------------------------------
 
 	VerticalBox = NewObject<UVerticalBox>();
 	ScrollBox->AddChild(VerticalBox);
@@ -110,13 +101,10 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 	UBorder* Border = NewObject<UBorder>();
 	Border->SetContent(ScrollBox);
 
-	// --- Remove default border padding so content reaches the edges ---
 	Border->SetPadding(FMargin(0.0f));
 
-	// --- Clip the scrolling content so it doesn't poke outside the rounded corners ---
 	Border->SetClipping(EWidgetClipping::ClipToBounds);
 
-	// --- Create a Rounded Brush for the Spreadsheet Area ---
 	FSlateBrush RoundedBrush;
 	RoundedBrush.DrawAs = ESlateBrushDrawType::RoundedBox;
 	RoundedBrush.OutlineSettings.RoundingType = ESlateBrushRoundingType::FixedRadius;
@@ -128,9 +116,7 @@ void ULayoutWidget::GenerateAssetGroup(UVerticalBox*& VerticalBox, UButton* Load
 	UISlot->SetSize(FVector2D(580, scroll_size));
 	UISlot->SetPosition(FVector2D(10, top + 45));
 
-	///////////////////////////////////////
-	// 4. Setup Horizontal Box to hold GUI buttons
-	///////////////////////////////////////
+
 	UHorizontalBox* ButBox = NewObject<UHorizontalBox>();
 	UBorder* ButBorder = NewObject<UBorder>();
 	ButBorder->SetContent(ButBox);
@@ -279,9 +265,6 @@ void ULayoutWidget::LoadUSD()
 	StaticVerticalBox->ClearChildren();
 	StaticAssetBoxArray.Empty();
 
-	// Clear assets from GUI
-	//StaticAnimVerticalBox->ClearChildren();
-	//StaticAnimAssetBoxArray.Empty();
 
 	// Get Sequencer
 	ALevelSequenceActor* CurrentSequencer = GetSequenceActor();
