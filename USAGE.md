@@ -41,9 +41,9 @@
 
 ## Project Setup
 
-- A sample python script is provided which executes the publish
+- A [sample python script](https://github.com/NeuralVFX/unreal-usd-layout-plugin/blob/main/maya_example.py) is provided which executes the publish
 - Each studio has different naming an publishing conventions, so this is a bare bones example
-- 
+  
 ### Requirements
 
 - Both rigs and props must be published, and referenced into animation scene
