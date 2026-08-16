@@ -1,4 +1,4 @@
-![](Images/jenga_b.gif)
+![](Images/usd_a.gif)
 # Unreal-USD-Layout-Plugin
 
 This plugin provides a GUI to manage exporting of USD layouts from Maya to Unreal
