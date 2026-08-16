@@ -89,6 +89,8 @@ void UAnimatedMeshAsset::Load()
 
 			Section->SetStartFrame(UHelpers::GetFrameNumberTick(Sequencer, StartFrame, false));
 			Section->SetEndFrame(UHelpers::GetFrameNumberTick(Sequencer, EndFrame, false));
+			// Focce evaulaation with LERP, so we dont need to EULER filter
+			Cast<UMovieScene3DTransformSection>(Section)->SetUseQuaternionInterpolation(true);
 
 			NewTrack->AddSection(*Cast<UMovieScene3DTransformSection>(Section));
 
