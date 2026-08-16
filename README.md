@@ -1,6 +1,7 @@
 <p align="center">
   <img src="Images/usd_a.gif" alt="USD Layout Plugin Preview"/>
 </p>
+
 # Unreal-USD-Layout-Plugin
 
 This plugin provides a GUI to manage exporting of USD layouts from Maya to Unreal
