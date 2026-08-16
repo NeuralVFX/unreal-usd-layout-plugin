@@ -25,7 +25,7 @@
 
 ## Import a USD file
 
-- Click `Load Layout File` and select your USD file
+- Click `Load USD` and select your USD file
 - Assets will be listed with a checkbox in the GUI
 - Check or un-check the boxes one by one to load and unload individual objects
 - Click `Load All Assets` or `Unload All Assets` to add or remove all objects at once
