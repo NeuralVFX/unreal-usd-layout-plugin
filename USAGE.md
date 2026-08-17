@@ -1,5 +1,5 @@
 
-# Getting Started
+# Unreal Side
 
 ## Requirements:
 
@@ -23,29 +23,39 @@
 - In the `Content Manager`, navigate to `LayoutEditor Content`
 - Right click `JsonLayoutLoader` and click `Run Editor Utility Widget`
 
-
-## Export a USD file
-
-- Select whichever static meshes you would like to export
-- Click `Save Layout File` and type your filename in
-
-![](Images/save.png)
-
-- Meshes with no animation will be stored as a transform
-- Meshes with animation in the LevelSequencer will be stored as keyframe values
-
-![](Images/json.png)
-
 ## Import a USD file
 
-- Click `Load Layout File` and select your USD file
+- Click `Load USD` and select your USD file
 - Assets will be listed with a checkbox in the GUI
 - Check or un-check the boxes one by one to load and unload individual objects
-
-![](Images/half_loaded.png)
-
 - Click `Load All Assets` or `Unload All Assets` to add or remove all objects at once
 
 ![](Images/loaded.png)
 
+
+# Maya Side
+
+## Requirements:
+
+- Maya 2027
+
+## Project Setup
+
+- A [sample python script](https://github.com/NeuralVFX/unreal-usd-layout-plugin/blob/main/maya_example.py) is provided which executes the publish
+- Each studio has different naming an publishing conventions, so this is a bare bones example
+  
+### Requirements
+
+- Both rigs and props must be published, and referenced into animation scene
+- All assets need `.unrealAssetPath` and `.unrealSceneName` attrs on top node
+- Rigs must have top group named `Rig_Root`
+
+
+## Export a USD file
+
+- Run the script
+- Select the object and click the `>` button to tag it for export
+- Click `Publish USD` and type your filename in
+  
+![](Images/save.png)
 
