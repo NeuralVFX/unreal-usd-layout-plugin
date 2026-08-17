@@ -71,7 +71,7 @@ void UAnimatedSkelMeshAsset::Load()
             if (SkelMeshAsset)
             {
                 SpawnedActor->GetSkeletalMeshComponent()->SetSkeletalMesh(SkelMeshAsset);
-                SpawnedActor->GetSkeletalMeshComponent()->BoundsScale = 900000.0f; // Mirroring your Python bounds scaling
+                SpawnedActor->GetSkeletalMeshComponent()->BoundsScale = 900000.0f; 
 
                 TargetSkeleton = SkelMeshAsset->GetSkeleton();
             }
@@ -123,10 +123,9 @@ UAnimSequence* UAnimatedSkelMeshAsset::ImportFbxAnimation(const FString& FilePat
         return nullptr;
     }
 
-    // Mirroring factory.ImportUI from Python
+    // factory.ImportUI 
     UFbxImportUI* ImportUI = NewObject<UFbxImportUI>();
 
-    // CRITICAL FIX: Stop Unreal from overriding our import type just because it sees geometry in the FBX
     ImportUI->bAutomatedImportShouldDetectType = false;
 
     ImportUI->bIsObjImport = false;

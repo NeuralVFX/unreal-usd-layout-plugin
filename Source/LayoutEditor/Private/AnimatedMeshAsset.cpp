@@ -58,7 +58,6 @@ void UAnimatedMeshAsset::Load()
 
 			CachedActor = Cast<AActor>(SpawnedActor);
 
-			
 			FGuid Guid;
 			Guid = Sequence->MovieScene->AddPossessable(SpawnedActor->GetActorLabel(), SpawnedActor->GetClass());
 			Sequence->BindPossessableObject(Guid, *SpawnedActor, SpawnedActor->GetWorld());
@@ -89,6 +88,7 @@ void UAnimatedMeshAsset::Load()
 
 			Section->SetStartFrame(UHelpers::GetFrameNumberTick(Sequencer, StartFrame, false));
 			Section->SetEndFrame(UHelpers::GetFrameNumberTick(Sequencer, EndFrame, false));
+
 			// Focce evaulaation with LERP, so we dont need to EULER filter
 			Cast<UMovieScene3DTransformSection>(Section)->SetUseQuaternionInterpolation(true);
 

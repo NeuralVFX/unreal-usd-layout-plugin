@@ -118,6 +118,9 @@ void UCamera::Load()
 
 			TransformSection->SetStartFrame(UHelpers::GetFrameNumberTick(Sequencer, StartFrame, false));
 			TransformSection->SetEndFrame(UHelpers::GetFrameNumberTick(Sequencer, EndFrame, false));
+			// Focce evaulaation with LERP, so we dont need to EULER filter
+			Cast<UMovieScene3DTransformSection>(TransformSection)->SetUseQuaternionInterpolation(true);
+
 			TransformTrack->AddSection(*Cast<UMovieScene3DTransformSection>(TransformSection));
 
 			const FMovieSceneChannelProxy& ChannelProxy = TransformSection->GetChannelProxy();
@@ -244,7 +247,7 @@ void UCamera::Unload()
 		if (CachedActor.IsValid())
 		{
 			CachedActor.Get()->Destroy();
-			CachedActor.Reset(); // Clear the weak pointer out
+			CachedActor.Reset(); 
 		}
 	}
 }
